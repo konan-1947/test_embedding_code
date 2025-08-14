@@ -33,5 +33,5 @@ lerna-debug.log*
 Thumbs.db
 
 # Continue directory
-!.continue/
+.continue/
 
