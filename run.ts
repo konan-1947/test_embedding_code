@@ -6,12 +6,12 @@ import { runIndexer } from './indexer';
 import { runQuery } from './query';
 
 function buildParsers() {
-    console.log(chalk.blue.bold('--- Kiểm tra và Biên dịch Parsers (nếu cần) ---'));
+    console.log(chalk.blue.bold('--- Check and Build Parsers (if needed) ---'));
     try {
-        // Lệnh build này sẽ tạo file .wasm ở thư mục gốc
+        // This build command will create .wasm files in the root directory
         const buildCommand = "tree-sitter build --wasm parsers/tree-sitter-javascript && tree-sitter build --wasm parsers/tree-sitter-typescript/typescript && tree-sitter build --wasm parsers/tree-sitter-python && tree-sitter build --wasm parsers/tree-sitter-html && tree-sitter build --wasm parsers/tree-sitter-css && tree-sitter build --wasm parsers/tree-sitter-json";
         
-        // Script Node.js để di chuyển file, hoạt động trên mọi HĐH
+        // Node.js script to move files, works on all OS
         const moveScript = `
             const fs = require('fs');
             const path = require('path');
@@ -24,16 +24,16 @@ function buildParsers() {
             });
         `;
 
-        console.log(chalk.gray('   - Đang chạy lệnh build...'));
+        console.log(chalk.gray('   - Running build command...'));
         execSync(buildCommand, { stdio: 'pipe' });
         
-        console.log(chalk.gray('   - Đang di chuyển file .wasm...'));
+        console.log(chalk.gray('   - Moving .wasm files...'));
         execSync(`node -e "${moveScript.replace(/\n/g, '')}"`, { stdio: 'pipe' });
 
-        console.log(chalk.green.bold('✅ Quá trình build hoàn tất!\n'));
+        console.log(chalk.green.bold('✅ Build process complete!\n'));
     } catch (error) {
-        // Bỏ qua lỗi nếu không có gì để build/move
-        console.log(chalk.gray('   - Không có parser mới nào được biên dịch hoặc đã xảy ra lỗi nhỏ. Bỏ qua.\n'));
+        // Ignore errors if there's nothing to build/move
+        console.log(chalk.gray('   - No new parsers were compiled or a minor error occurred. Skipping.\n'));
     }
 }
 
@@ -41,34 +41,34 @@ async function main() {
     const command = process.argv[2];
     const argument = process.argv.slice(3).join(' ');
 
-    console.log(chalk.inverse('\n--- Trợ Lý Code Đa Năng ---'));
+    console.log(chalk.inverse('\n--- Versatile Code Assistant ---\n'));
 
     try {
         if (command === 'build') {
             buildParsers();
         } else if (command === 'index') {
             if (!argument) {
-                console.error(chalk.red("Lỗi: Vui lòng cung cấp đường dẫn đến project."));
-                console.log(chalk.yellow("-> Cách dùng: npx tsx run.ts index ./sample-project"));
+                console.error(chalk.red("Error: Please provide the path to the project."));
+                console.log(chalk.yellow("-> Usage: npx tsx run.ts index ./sample-project"));
                 return;
             }
-            buildParsers(); // Luôn kiểm tra build trước khi index
+            buildParsers(); // Always check build before indexing
             await runIndexer(argument);
         } else if (command === 'query') {
             if (!argument) {
-                console.error(chalk.red("Lỗi: Vui lòng cung cấp câu hỏi."));
-                console.log(chalk.yellow("-> Cách dùng: npx tsx run.ts query \"câu hỏi của bạn\""));
+                console.error(chalk.red("Error: Please provide a question."));
+                console.log(chalk.yellow("-> Usage: npx tsx run.ts query \"your question\""));
                 return;
             }
             await runQuery(argument);
         } else {
-            console.log(chalk.yellow("\nLệnh không hợp lệ. Các lệnh có sẵn:"));
-            console.log(chalk.green("  build                      ") + "- Biên dịch các parser (chạy riêng nếu cần).");
-            console.log(chalk.green("  index <path_to_project>    ") + "- Để lập chỉ mục cho một project.");
-            console.log(chalk.green("  query \"<your_question>\"    ") + "- Để đặt câu hỏi.");
+            console.log(chalk.yellow("\nInvalid command. Available commands:"));
+            console.log(chalk.green("  build                      ") + "- Build the parsers (run separately if needed).");
+            console.log(chalk.green("  index <path_to_project>    ") + "- To index a project.");
+            console.log(chalk.green("  query \"<your_question>\"    ") + "- To ask a question.");
         }
     } catch (error) {
-        console.error(chalk.red.bold("\n❌ Đã xảy ra lỗi không mong muốn:"), error);
+        console.error(chalk.red.bold("\n❌ An unexpected error occurred:"), error);
     }
 }
 
